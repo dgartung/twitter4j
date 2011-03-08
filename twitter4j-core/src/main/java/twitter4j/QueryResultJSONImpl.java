@@ -16,20 +16,21 @@
 
 package twitter4j;
 
-import twitter4j.internal.http.HttpResponse;
-import twitter4j.internal.org.json.JSONArray;
-import twitter4j.internal.org.json.JSONException;
-import twitter4j.internal.org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static twitter4j.internal.util.ParseUtil.getDouble;
 import static twitter4j.internal.util.ParseUtil.getInt;
 import static twitter4j.internal.util.ParseUtil.getLong;
 import static twitter4j.internal.util.ParseUtil.getRawString;
 import static twitter4j.internal.util.ParseUtil.getURLDecodedString;
 import static twitter4j.internal.util.ParseUtil.getUnescapedString;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import twitter4j.internal.http.HttpResponse;
+import twitter4j.internal.json.DataObjectFactoryUtil;
+import twitter4j.internal.org.json.JSONArray;
+import twitter4j.internal.org.json.JSONException;
+import twitter4j.internal.org.json.JSONObject;
 
 /**
  * A data class representing search API response
@@ -65,7 +66,10 @@ import static twitter4j.internal.util.ParseUtil.getUnescapedString;
             tweets = new ArrayList<Tweet>(array.length());
             for (int i = 0; i < array.length(); i++) {
                 JSONObject tweet = array.getJSONObject(i);
-                tweets.add(new TweetJSONImpl(tweet));
+                TweetJSONImpl impl = new TweetJSONImpl(tweet);
+                
+                tweets.add(impl);
+                DataObjectFactoryUtil.registerJSONObject(impl, tweet);
             }
         } catch (JSONException jsone) {
             throw new TwitterException(jsone.getMessage() + ":" + json.toString(), jsone);
